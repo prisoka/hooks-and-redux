@@ -1,76 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Recipe from './Recipe';
 
-const mockRecipes = [
-  {
-    name: 'Bolo de cenoura',
-    ingredients: ['flour', 'carrot', 'eggs', 'sugar'],
-    steps: ['xxx', 'yyy', 'zzz'],
-  },
-  {
-    name: 'Bolo de banana',
-    ingredients: ['flour', 'banana', 'eggs', 'sugar'],
-    steps: ['xxx', 'yyy', 'zzz'],
-  },
-  {
-    name: 'Overnight oats',
-    ingredients: ['oats', 'berries', 'chia', 'almond milk', 'carrot'],
-    steps: ['xxx', 'yyy', 'zzz'],
-  },
-  {
-    name: 'Chai tea',
-    ingredients: ['cinnamon', 'cardamon', 'ginger', 'clove'],
-    steps: ['xxx', 'yyy', 'zzz'],
-  },
-];
-
 const Main = () => {
-  const [recipes, setRecipes] = useState(mockRecipes);
-  const [keyword, setKeyword] = useState('');
-  const [isSearch, setIsSearch] = useState(false);
-  const [showNotFound, setShowNotFound] = useState(false);
-  const [filteredRecipe, setFilteredRecipe] = useState([]);
+  const dispatch = useDispatch();
+
+  const keyword = useSelector((state) => state.recipeReducer.keyword);
+  const isSearch = useSelector((state) => state.recipeReducer.isSearch);
+  const showNotFound = useSelector((state) => state.recipeReducer.showNotFound);
+  const filteredRecipe = useSelector(
+    (state) => state.recipeReducer.filteredRecipe
+  );
 
   const handleSearchChange = (e) => {
-    setKeyword(e.target.value);
+    const newKeyword = e.target.value;
+    dispatch({ type: 'set_search_keyword', payload: newKeyword });
   };
 
   const handleSearchClick = () => {
-    const keywordLowerCase = keyword.toLowerCase();
-    const foundRecipes = [];
-
-    recipes.map((recipe) => {
-      return Object.keys(recipe).forEach((key) => {
-        if (key === 'name') {
-          const values = recipe[key].split(' ');
-          const valuesLowerCase = [];
-          values.forEach((value) => valuesLowerCase.push(value.toLowerCase()));
-
-          if (valuesLowerCase.includes(keywordLowerCase)) {
-            foundRecipes.push(recipe);
-          }
-        }
-
-        if (key === 'ingredients') {
-          const values = recipe[key];
-          const valuesLowerCase = [];
-          values.forEach((value) => valuesLowerCase.push(value.toLowerCase()));
-
-          if (
-            valuesLowerCase.includes(keywordLowerCase) &&
-            !foundRecipes.includes(recipe)
-          ) {
-            foundRecipes.push(recipe);
-          }
-        }
-      });
+    dispatch({
+      type: 'search_recipe',
+      payload: { isSearch: true },
     });
-
-    if (!foundRecipes.length) {
-      setShowNotFound(true);
-    }
-    setIsSearch(true);
-    setFilteredRecipe(foundRecipes);
   };
 
   return (

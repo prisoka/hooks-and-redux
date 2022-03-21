@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import appReducers from './redux/reducers/appReducers';
 import './index.css';
@@ -7,13 +8,12 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 const store = createStore(appReducers);
-
-store.subscribe(() => console.log(store.getState()));
+// store.subscribe(() => console.log('oi', store.getState()));
 
 ReactDOM.render(
-  <React.StrictMode>
+  <Provider store={store}>
     <App />
-  </React.StrictMode>,
+  </Provider>,
   document.getElementById('root')
 );
 

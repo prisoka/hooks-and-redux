@@ -37,9 +37,55 @@ const ACTIONS = {
 const recipeReducer = (state = initialState, action) => {
   switch (action.type) {
     case ACTIONS.SET_SEARCH_KEYWORD:
-      return '';
+      const newKeyword = action.payload;
+      return { ...state, keyword: newKeyword };
     case ACTIONS.SEARCH_RECIPE:
-      return '';
+      const newIsSearch = action.payload.isSearch;
+      const keywordLowerCase = state.keyword.toLowerCase();
+      const foundRecipes = [];
+      let newNotFound = false;
+
+      state.recipes.map((recipe) => {
+        return Object.keys(recipe).forEach((key) => {
+          if (key === 'name') {
+            const values = recipe[key].split(' ');
+            const valuesLowerCase = [];
+            values.forEach((value) =>
+              valuesLowerCase.push(value.toLowerCase())
+            );
+
+            if (valuesLowerCase.includes(keywordLowerCase)) {
+              foundRecipes.push(recipe);
+            }
+          }
+
+          if (key === 'ingredients') {
+            const values = recipe[key];
+            const valuesLowerCase = [];
+            values.forEach((value) =>
+              valuesLowerCase.push(value.toLowerCase())
+            );
+
+            if (
+              valuesLowerCase.includes(keywordLowerCase) &&
+              !foundRecipes.includes(recipe)
+            ) {
+              foundRecipes.push(recipe);
+            }
+          }
+        });
+      });
+
+      if (!foundRecipes.length) {
+        newNotFound = true;
+      }
+
+      return {
+        ...state,
+        isSearch: newIsSearch,
+        showNotFound: newNotFound,
+        filteredRecipe: foundRecipes,
+      };
     default:
       return state;
   }
